@@ -3,13 +3,13 @@
 const express = require('express')
 const cors= require('cors')
 const app = express(); 
-const jsonData = require("./Movie Data/data.json");
+const jsonData = require("./MovieData/data.json");
 
 
 
     
     
-    var error404 = {
+    var error_404 = {
         "status": 404,
         "responseText": "This page endpoint not found "
         }
@@ -22,7 +22,7 @@ app.get('*', error404 )
 
 
 function homepage(req,res){
-    res.status(200).send({
+    res.status(200).json({
         "title": "Spider-Man: No Way Home",
         "poster_path": "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
         "overview": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man."
@@ -44,7 +44,7 @@ function homepage(req,res){
     
 
 function error404 (req,res){
-res.status(404).send(error404)
+res.status(404).send(error_404)
 }
 
 

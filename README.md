@@ -7,12 +7,15 @@ Task-11
 
 ## WRRC
 
-https://github.com/Aamershwayat/Movies-Library/issues/1#issue-1120943631
+![WRRC](./wrrcPhoto/wrrc.png)
 
 ## Overview
 
 ## Getting Started
 <!-- What are the steps that a user must take in order to build this app on their own machine and get it running? -->
+1.  npm install
+2.  node server.js
+
 
 ## Project Features
 <!-- What are the features included in you app -->
