@@ -1,57 +1,87 @@
-'use strict'
+'use strict';
 
-const express = require('express')
-const cors= require('cors')
-const app = express(); 
-const jsonData = require("./MovieData/data.json");
+const express = require("express");
 
+const app = express();
 
+const axios = require("axios");
 
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const APIKEY = process.env.APIKEY;
+const PORT = process.env.PORT;
+
+app.get("/", (req, res) => {
+    return res.status(200).send("Hello World");
+});
+
+app.get("/trending", trendingHandler);
+
+app.get("/search", searchMovieHandler)
+
+app.use(errorHandler);
+
+app.use("*", notFountHandler);
+
+function Movie(title, id, release_date, poster_path, overview){
+    this.id = id;
+    this.title = title;
+    this.release_date = release_date;
+    this.poster_path = poster_path;
+    this.overview = overview;
     
-    
-    var error_404 = {
-        "status": 404,
-        "responseText": "This page endpoint not found "
-        }
+}
 
-// www.localhost:3000/hello 
-
-app.get ('/' , homepage )
-app.get ('/favorite', favorite)
-app.get('*', error404 )
-
-
-function homepage(req,res){
-    res.status(200).json({
-        "title": "Spider-Man: No Way Home",
-        "poster_path": "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg",
-        "overview": "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man."
+function trendingHandler(req,res){
+    let movies = []
+    axios.get(`https://api.themoviedb.org/3/trending/all/week?api_key=${APIKEY}&language=en-US`).then(value => {
+        value.data.results.forEach(element => {
+            let movie = new Movie(element.title, element.id, element.release_date, element.poster_path, element.overview);
+            movies.push(movie);
+            
         })
-    }
-    
-    function Ensure(title,poster_path,overview)
-    {
-        this.title = title;
-        this.poster_path = poster_path;
-        this.overview = overview;
-    }
+
+        
+        return res.status(200).json(movies);
+    }).catch((error) => {
+        errorHandler(error, req,res);
+    })
+   
+};
 
 
+function searchMovieHandler(req, res){
 
-    function favorite(req,res){
-        res.status(200).send("Welcome to Favorite Page");
-    }
-    
-
-function error404 (req,res){
-res.status(404).send(error_404)
+    let serachQuery = req.query.searchStr;
+    let numberOfPages= req.query.numberOfPages
+    let movies = [];
+    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${APIKEY}&language=en-US&query=${serachQuery}&page=${numberOfPages}`).then(value => {
+        value.data.results.forEach(element => {
+            let movie = new Movie(element.title, element.id, element.release_date, element.poster_path, element.overview);
+            movies.push(movie);
+        })
+        return res.status(200).json(movies);
+    }).catch(error => {
+        errorHandler(error, req,res);
+    })
 }
 
 
+function notFountHandler(req,res){
+    res.status(404).send("No endpoint with this name");
+}
 
+function errorHandler(error, req, res){
+    const err = {
+        status : 500,
+        message : error
+    }
 
-app.listen (3000, () => {
-    console.log("I can hear you");
+    res.status(500).send(err);
+}
 
-} )
- 
+app.listen(PORT, () => {
+    console.log(`I am using port ${PORT}`);
+});
