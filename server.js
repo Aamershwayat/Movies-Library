@@ -18,8 +18,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/trending", trendingHandler);
-
+app.get("/upcoming",upcomingMovie)
 app.get("/search", searchMovieHandler)
+app.get("/recommendations",recommended)
+
 
 app.use(errorHandler);
 
@@ -33,6 +35,7 @@ function Movie(title, id, release_date, poster_path, overview){
     this.overview = overview;
     
 }
+
 
 function trendingHandler(req,res){
     let movies = []
@@ -52,6 +55,8 @@ function trendingHandler(req,res){
 };
 
 
+
+
 function searchMovieHandler(req, res){
 
     let serachQuery = req.query.searchStr;
@@ -67,6 +72,45 @@ function searchMovieHandler(req, res){
         errorHandler(error, req,res);
     })
 }
+
+
+
+function recommended(req, res){
+
+    let recommendFilmId = req.query.recommendFilmId;
+    let movies = [];
+    axios.get(`https://api.themoviedb.org/3/movie/${recommendFilmId}/recommendations?api_key=${APIKEY}&language=en-US&page=1`).then(value => {
+        value.data.results.forEach(element => {
+            let recomendedMovie = new Movie(element.title, element.id, element.release_date, element.poster_path, element.overview);
+            movies.push(recomendedMovie);
+        })
+        
+        return res.status(200).json(movies);
+    }).catch(error => {
+        errorHandler(error, req,res);
+    })
+}
+
+
+
+
+
+function upcomingMovie(req, res){
+  
+  
+    let movies = [];
+    axios.get(`https://api.themoviedb.org/3/movie/upcoming?api_key=${APIKEY}&language=en-US`).then(value => {
+        value.data.results.forEach(element => {
+            let recomendedMovie = new Movie(element.title, element.id, element.release_date, element.poster_path, element.overview);
+            movies.push(recomendedMovie);
+        })
+        return res.status(200).json(movies);
+    }).catch(error => {
+        errorHandler(error, req,res);
+    })
+}
+
+
 
 
 function notFountHandler(req,res){
