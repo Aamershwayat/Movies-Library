@@ -21,7 +21,10 @@ const APIKEY = process.env.APIKEY;
 const PORT = process.env.PORT;
 
 // Prepair the connnection between database  and server using pg library and database URL from .env
-const client = new pg.Client(DATABASE_URL);
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+});
 
 
 // Endpoints, Routs, Path  
